@@ -63,7 +63,7 @@ Now white moves, and captures the black pawn.
 
 ## Some other notes
 
-I feel that this app properly models the quantum nature of the game.  We had explored the idea of just maintaining and calculatingn probabilities, but we determined that there are cases where this wouldn't suffice.
+I feel that this app properly models the quantum nature of the game.  We had explored the idea of just maintaining and calculating probabilities, but we determined that there are cases where this wouldn't suffice.
 
 Suppose we have in our board space a board that has a white pawn at **C4** at a 25% probability and a black rook at **C1** also at a 25% probability.  We want to move the rook to **C5**.  If we just look at probabilities, then there's a 6.25% probability that the rook will be blocked.  But in the _actual_ quantum board space, the rook's 25% and the pawns 25% may be completely disjoint.  This would mean that there's a 100% chance that the rook would move _in the boards that had the rook there_ because there's no board where the rook would be blocked.  This can't be modeled with mere probabilities, so we have to track each board.
 
