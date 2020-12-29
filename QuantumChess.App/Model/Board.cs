@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace QuantumChess.App.Model
 {
@@ -10,6 +9,8 @@ namespace QuantumChess.App.Model
 		// List<T>.Enumerator is a struct, but I need class enumerators so that I can advance
 		// them manually.  The enumerator returned by arrays is a class, so we use that.
 		public Piece[] Pieces { get; private set; }
+
+		public bool KingCaptured { get; private set; }
 
 		private Board(){ }
 
@@ -58,21 +59,23 @@ namespace QuantumChess.App.Model
 			};
 		}
 
-		public int DuplicationCount { get; private set; } = 1;
+		public long DuplicationCount { get; private set; } = 1;
 
 		public Board PerformMove(int sourceRow, int sourceCol, int targetRow, int targetCol, PieceColor turn)
 		{
+			if (KingCaptured) return null;
+
 			var piece = Pieces.FirstOrDefault(p => p.Row == sourceRow && p.Column == sourceCol && p.IsPlayable);
 			if (piece == null || piece.Color != turn)
 			{
-				DuplicationCount++;
+				DuplicationCount *= 2;
 				return null;
 			}
 
 			var victim = Pieces.FirstOrDefault(p => p.Row == targetRow && p.Column == targetCol);
 			if (victim?.Color == piece.Color)
 			{
-				DuplicationCount++;
+				DuplicationCount *= 2;
 				return null;
 			}
 
@@ -82,11 +85,15 @@ namespace QuantumChess.App.Model
 			};
 			piece = board.Pieces.FirstOrDefault(p => p.Row == sourceRow && p.Column == sourceCol);
 			victim = board.Pieces.FirstOrDefault(p => p.Row == targetRow && p.Column == targetCol);
-			victim?.Capture();
+			if (victim != null)
+			{
+				victim.Capture();
+				KingCaptured = victim.Kind == PieceKind.King;
+			}
 
 			if (!CanMovePiece(piece, targetRow, targetCol))
 			{
-				DuplicationCount++;
+				DuplicationCount *= 2;
 				return null;
 			}
 			
@@ -183,19 +190,42 @@ namespace QuantumChess.App.Model
 			return null;
 		}
 
-		private List<(int Row, int Column)> GetPotentialBlocksForBishop(Piece piece, int targetRow, int targetCol)
+		private static List<(int Row, int Column)> GetPotentialBlocksForBishop(Piece piece, int targetRow, int targetCol)
 		{
-			return null;
+			if (Math.Abs(targetRow - piece.Row) != Math.Abs(targetCol - piece.Column)) return null;
+
+			var xDirection = Math.Sign(targetCol - piece.Column);
+			var yDirection = Math.Sign(targetRow - piece.Row);
+
+			var blocks = new List<(int Row, int Column)>();
+			var col = piece.Column + xDirection;
+			var row = piece.Row + yDirection;
+			while (row != targetRow)
+			{
+				blocks.Add((row, col));
+				col += xDirection;
+				row += yDirection;
+			}
+
+			return blocks;
 		}
 
-		private List<(int Row, int Column)> GetPotentialBlocksForQueen(Piece piece, int targetRow, int targetCol)
+		private static List<(int Row, int Column)> GetPotentialBlocksForQueen(Piece piece, int targetRow, int targetCol)
 		{
-			return null;
+			var rookBlockers = GetPotentialBlocksForRook(piece, targetRow, targetCol);
+			var bishopBlockers = GetPotentialBlocksForBishop(piece, targetRow, targetCol);
+
+			if (rookBlockers == null) return bishopBlockers;
+			if (bishopBlockers == null) return rookBlockers;
+
+			return rookBlockers.Union(bishopBlockers).ToList();
 		}
 
 		private List<(int Row, int Column)> GetPotentialBlocksForKing(Piece piece, int targetRow, int targetCol)
 		{
-			return null;
+			if (Math.Abs(targetRow - piece.Row) > 1 || Math.Abs(targetCol - piece.Column) > 1) return null;
+
+			return new List<(int Row, int Column)> {(targetRow, targetCol)};
 		}
 
 		public void RevertDuplication()

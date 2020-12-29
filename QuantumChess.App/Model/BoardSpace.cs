@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Input;
 using QuantumChess.App.Framework;
 
 namespace QuantumChess.App.Model
@@ -8,11 +9,13 @@ namespace QuantumChess.App.Model
 	public class BoardSpace : ViewModelBase
 	{
 		private List<QuantumCell> _cells;
-		private int _totalBoardCount;
+		private long _totalBoardCount;
 		private int _distinctBoardCount;
 		private PieceColor _turn;
 		private int _turns;
 		private QuantumCell _selected;
+		private bool _viewSingleBoard;
+		private int _selectedBoardIndex = 1;
 
 		public List<Board> Space { get; } = new List<Board>{Board.CreateNew()};
 
@@ -29,7 +32,7 @@ namespace QuantumChess.App.Model
 			}
 		}
 
-		public int TotalBoardCount
+		public long TotalBoardCount
 		{
 			get => _totalBoardCount;
 			set
@@ -84,13 +87,80 @@ namespace QuantumChess.App.Model
 			}
 		}
 
-		public BoardSpace()
+		public bool ViewSingleBoard
 		{
-			PopulateCells();
-			_turn = PieceColor.White;
+			get => _viewSingleBoard;
+			set
+			{
+				if (value == _viewSingleBoard) return;
+				_viewSingleBoard = value;
+				PopulateBoard();
+				NotifyOfPropertyChange();
+			}
 		}
 
-		public void PopulateCells()
+		public int SelectedBoardIndex
+		{
+			get => _selectedBoardIndex;
+			set
+			{
+				if (value == _selectedBoardIndex) return;
+				_selectedBoardIndex = value;
+				PopulateBoard();
+				NotifyOfPropertyChange();
+			}
+		}
+
+		public ICommand Reset { get; }
+
+		public BoardSpace()
+		{
+			PopulateBoard();
+			_turn = PieceColor.White;
+
+			Reset = new SimpleCommand(() =>
+			{
+				Space.Clear();
+				Space.Add(Board.CreateNew());
+				Turn = PieceColor.White;
+				Turns = 0;
+				PopulateBoard();
+			});
+		}
+
+		private void PopulateBoard()
+		{
+			if (ViewSingleBoard)
+				PopulateSingleBoard();
+			else
+				PopulateQuantumBoard();
+		}
+
+		private void PopulateSingleBoard()
+		{
+			var boardIndex = SelectedBoardIndex - 1; // uses 1-indexing because it uses the board counts for the range
+			var board = Space[boardIndex];
+
+			var quantumBoard = Enumerable.Range(0, 64).Select(i => new QuantumCell
+				{
+					Color = (SquareColor)((i + i / 8) % 2)
+				})
+				.ToList();
+			foreach (var piece in board.Pieces.Where(p => p.IsPlayable))
+			{
+				var index = piece.Row * 8 + piece.Column;
+				quantumBoard[index].Pieces.Add(new PieceProbability
+				{
+					Piece = piece,
+					Count = 1,
+					Potential = 1
+				});
+			}
+
+			Cells = quantumBoard;
+		}
+
+		private void PopulateQuantumBoard()
 		{
 			var quantumBoard = Enumerable.Range(0, 64).Select(i => new QuantumCell
 				{
@@ -157,7 +227,7 @@ namespace QuantumChess.App.Model
 					if (newBoards.Any())
 					{
 						Space.AddRange(newBoards);
-						PopulateCells();
+						PopulateBoard();
 						sender = null;
 						Turn = Turn == PieceColor.White ? PieceColor.Black : PieceColor.White;
 						Turns++;
