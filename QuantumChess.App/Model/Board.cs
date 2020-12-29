@@ -62,8 +62,15 @@ namespace QuantumChess.App.Model
 
 		public Board PerformMove(int sourceRow, int sourceCol, int targetRow, int targetCol, PieceColor turn)
 		{
-			var piece = Pieces.FirstOrDefault(p => p.Row == sourceRow && p.Column == sourceCol);
+			var piece = Pieces.FirstOrDefault(p => p.Row == sourceRow && p.Column == sourceCol && p.IsPlayable);
 			if (piece == null || piece.Color != turn)
+			{
+				DuplicationCount++;
+				return null;
+			}
+
+			var victim = Pieces.FirstOrDefault(p => p.Row == targetRow && p.Column == targetCol);
+			if (victim?.Color == piece.Color)
 			{
 				DuplicationCount++;
 				return null;
@@ -74,6 +81,8 @@ namespace QuantumChess.App.Model
 				Pieces = Pieces.Select(p => p.Clone()).ToArray()
 			};
 			piece = board.Pieces.FirstOrDefault(p => p.Row == sourceRow && p.Column == sourceCol);
+			victim = board.Pieces.FirstOrDefault(p => p.Row == targetRow && p.Column == targetCol);
+			victim?.Capture();
 
 			if (!CanMovePiece(piece, targetRow, targetCol))
 			{
@@ -81,9 +90,6 @@ namespace QuantumChess.App.Model
 				return null;
 			}
 			
-			var victim = board.Pieces.FirstOrDefault(p => p.Row == targetRow && p.Column == targetCol);
-			victim?.Capture();
-
 			piece.Row = targetRow;
 			piece.Column = targetCol;
 			return board;
@@ -145,6 +151,10 @@ namespace QuantumChess.App.Model
 
 		private List<(int Row, int Column)> GetPotentialBlocksForKnight(Piece piece, int targetRow, int targetCol)
 		{
+			if ((Math.Abs(piece.Row - targetRow) == 1 && Math.Abs(piece.Column - targetCol) == 2) ||
+			    (Math.Abs(piece.Row - targetRow) == 2 && Math.Abs(piece.Column - targetCol) == 1))
+				return new List<(int Row, int Column)>();
+
 			return null;
 		}
 

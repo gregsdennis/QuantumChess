@@ -61,6 +61,8 @@ namespace QuantumChess.App.Model
 			}
 		}
 
+		public int Turns { get; set; }
+
 		public BoardSpace()
 		{
 			PopulateCells();
@@ -137,6 +139,7 @@ namespace QuantumChess.App.Model
 						PopulateCells();
 						sender = null;
 						Turn = Turn == PieceColor.White ? PieceColor.Black : PieceColor.White;
+						Turns++;
 					}
 					else
 					{

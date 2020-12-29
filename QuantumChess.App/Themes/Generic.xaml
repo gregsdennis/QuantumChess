@@ -21,14 +21,18 @@
 								</ItemsPanelTemplate>
 							</ItemsControl.ItemsPanel>
 						</ItemsControl>
-						<UniformGrid Grid.Row="1" Columns="3">
+						<UniformGrid Grid.Row="1" Columns="4">
 							<TextBlock Text="Turn" FontWeight="Bold"
+							           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+							<TextBlock Text="Turns (each player)" FontWeight="Bold"
 							           HorizontalAlignment="Center" VerticalAlignment="Center"/>
 							<TextBlock Text="Total Board Count" FontWeight="Bold"
 							           HorizontalAlignment="Center" VerticalAlignment="Center"/>
 							<TextBlock Text="Distinct Board Count" FontWeight="Bold"
 							           HorizontalAlignment="Center" VerticalAlignment="Center"/>
 							<TextBlock Text="{Binding BoardSpace.Turn, RelativeSource={RelativeSource TemplatedParent}}"
+							           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+							<TextBlock Text="{Binding BoardSpace.Turns, RelativeSource={RelativeSource TemplatedParent}}"
 							           HorizontalAlignment="Center" VerticalAlignment="Center"/>
 							<TextBlock Text="{Binding BoardSpace.TotalBoardCount, RelativeSource={RelativeSource TemplatedParent}}"
 							           HorizontalAlignment="Center" VerticalAlignment="Center"/>
