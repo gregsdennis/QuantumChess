@@ -19,41 +19,41 @@ namespace QuantumChess.App.Model
 			{
 				Pieces = new[]
 				{
-					new Piece(PieceColor.White, PieceKind.Rook, 0, 0),
-					new Piece(PieceColor.White, PieceKind.Knight, 0, 1),
-					new Piece(PieceColor.White, PieceKind.Bishop, 0, 2),
-					new Piece(PieceColor.White, PieceKind.King, 0, 3),
-					new Piece(PieceColor.White, PieceKind.Queen, 0, 4),
-					new Piece(PieceColor.White, PieceKind.Bishop, 0, 5),
-					new Piece(PieceColor.White, PieceKind.Knight, 0, 6),
-					new Piece(PieceColor.White, PieceKind.Rook, 0, 7),
+					new Piece(PieceColor.Black, PieceKind.Rook, 0, 0),
+					new Piece(PieceColor.Black, PieceKind.Knight, 0, 1),
+					new Piece(PieceColor.Black, PieceKind.Bishop, 0, 2),
+					new Piece(PieceColor.Black, PieceKind.Queen, 0, 3),
+					new Piece(PieceColor.Black, PieceKind.King, 0, 4),
+					new Piece(PieceColor.Black, PieceKind.Bishop, 0, 5),
+					new Piece(PieceColor.Black, PieceKind.Knight, 0, 6),
+					new Piece(PieceColor.Black, PieceKind.Rook, 0, 7),
+										 
+					new Piece(PieceColor.Black, PieceKind.Pawn, 1, 0),
+					new Piece(PieceColor.Black, PieceKind.Pawn, 1, 1),
+					new Piece(PieceColor.Black, PieceKind.Pawn, 1, 2),
+					new Piece(PieceColor.Black, PieceKind.Pawn, 1, 3),
+					new Piece(PieceColor.Black, PieceKind.Pawn, 1, 4),
+					new Piece(PieceColor.Black, PieceKind.Pawn, 1, 5),
+					new Piece(PieceColor.Black, PieceKind.Pawn, 1, 6),
+					new Piece(PieceColor.Black, PieceKind.Pawn, 1, 7),
 
-					new Piece(PieceColor.White, PieceKind.Pawn, 1, 0),
-					new Piece(PieceColor.White, PieceKind.Pawn, 1, 1),
-					new Piece(PieceColor.White, PieceKind.Pawn, 1, 2),
-					new Piece(PieceColor.White, PieceKind.Pawn, 1, 3),
-					new Piece(PieceColor.White, PieceKind.Pawn, 1, 4),
-					new Piece(PieceColor.White, PieceKind.Pawn, 1, 5),
-					new Piece(PieceColor.White, PieceKind.Pawn, 1, 6),
-					new Piece(PieceColor.White, PieceKind.Pawn, 1, 7),
-
-					new Piece(PieceColor.Black, PieceKind.Pawn, 6, 0),
-					new Piece(PieceColor.Black, PieceKind.Pawn, 6, 1),
-					new Piece(PieceColor.Black, PieceKind.Pawn, 6, 2),
-					new Piece(PieceColor.Black, PieceKind.Pawn, 6, 3),
-					new Piece(PieceColor.Black, PieceKind.Pawn, 6, 4),
-					new Piece(PieceColor.Black, PieceKind.Pawn, 6, 5),
-					new Piece(PieceColor.Black, PieceKind.Pawn, 6, 6),
-					new Piece(PieceColor.Black, PieceKind.Pawn, 6, 7),
-
-					new Piece(PieceColor.Black, PieceKind.Rook, 7, 0),
-					new Piece(PieceColor.Black, PieceKind.Knight, 7, 1),
-					new Piece(PieceColor.Black, PieceKind.Bishop, 7, 2),
-					new Piece(PieceColor.Black, PieceKind.King, 7, 3),
-					new Piece(PieceColor.Black, PieceKind.Queen, 7, 4),
-					new Piece(PieceColor.Black, PieceKind.Bishop, 7, 5),
-					new Piece(PieceColor.Black, PieceKind.Knight, 7, 6),
-					new Piece(PieceColor.Black, PieceKind.Rook, 7, 7),
+					new Piece(PieceColor.White, PieceKind.Pawn, 6, 0),
+					new Piece(PieceColor.White, PieceKind.Pawn, 6, 1),
+					new Piece(PieceColor.White, PieceKind.Pawn, 6, 2),
+					new Piece(PieceColor.White, PieceKind.Pawn, 6, 3),
+					new Piece(PieceColor.White, PieceKind.Pawn, 6, 4),
+					new Piece(PieceColor.White, PieceKind.Pawn, 6, 5),
+					new Piece(PieceColor.White, PieceKind.Pawn, 6, 6),
+					new Piece(PieceColor.White, PieceKind.Pawn, 6, 7),
+										 
+					new Piece(PieceColor.White, PieceKind.Rook, 7, 0),
+					new Piece(PieceColor.White, PieceKind.Knight, 7, 1),
+					new Piece(PieceColor.White, PieceKind.Bishop, 7, 2),
+					new Piece(PieceColor.White, PieceKind.Queen, 7, 3),
+					new Piece(PieceColor.White, PieceKind.King, 7, 4),
+					new Piece(PieceColor.White, PieceKind.Bishop, 7, 5),
+					new Piece(PieceColor.White, PieceKind.Knight, 7, 6),
+					new Piece(PieceColor.White, PieceKind.Rook, 7, 7),
 				}
 			};
 		}
@@ -121,7 +121,7 @@ namespace QuantumChess.App.Model
 		private IEnumerable<(int Row, int Column)> GetPotentialBlocksForPawn(Piece piece, int targetRow, int targetCol)
 		{
 			var direction = (int) piece.Color;
-			var homeRow = piece.Color == PieceColor.White ? 1 : 6;
+			var homeRow = piece.Color == PieceColor.White ? 6 : 1;
 			if (targetCol == piece.Column)
 			{
 				// this only works for white
