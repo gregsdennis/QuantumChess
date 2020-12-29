@@ -8,10 +8,11 @@ namespace QuantumChess.App.Model
 	public class BoardSpace : ViewModelBase
 	{
 		private List<QuantumCell> _cells;
-		private QuantumCell _selected;
 		private int _totalBoardCount;
 		private int _distinctBoardCount;
 		private PieceColor _turn;
+		private int _turns;
+		private QuantumCell _selected;
 
 		public List<Board> Space { get; } = new List<Board>{Board.CreateNew()};
 
@@ -61,7 +62,27 @@ namespace QuantumChess.App.Model
 			}
 		}
 
-		public int Turns { get; set; }
+		public int Turns
+		{
+			get => _turns;
+			set
+			{
+				if (value == _turns) return;
+				_turns = value;
+				NotifyOfPropertyChange();
+			}
+		}
+
+		public QuantumCell Selected
+		{
+			get => _selected;
+			set
+			{
+				if (Equals(value, _selected)) return;
+				_selected = value;
+				NotifyOfPropertyChange();
+			}
+		}
 
 		public BoardSpace()
 		{
@@ -117,17 +138,17 @@ namespace QuantumChess.App.Model
 
 		private void UpdateSelection(object sender, EventArgs e)
 		{
-			if (_selected != null && _selected.IsSelected && _selected.Pieces.Count != 0)
+			if (Selected != null && Selected.IsSelected && Selected.Pieces.Count != 0)
 			{
 				var targetCell = (QuantumCell) sender;
 				var targetIndex = Cells.IndexOf(targetCell);
 				var targetRow = targetIndex / 8;
 				var targetCol = targetIndex % 8;
-				var sourceIndex = Cells.IndexOf(_selected);
+				var sourceIndex = Cells.IndexOf(Selected);
 				var sourceRow = sourceIndex / 8;
 				var sourceCol = sourceIndex % 8;
 
-				if (_selected.Pieces.Any(p => p.Piece.Color == Turn))
+				if (Selected.Pieces.Any(p => p.Piece.Color == Turn))
 				{
 					var newBoards = Space.Select(b => b.PerformMove(sourceRow, sourceCol, targetRow, targetCol, _turn))
 						.Where(b => b != null)
@@ -148,7 +169,7 @@ namespace QuantumChess.App.Model
 				}
 			}
 
-			_selected = (QuantumCell) sender;
+			Selected = (QuantumCell) sender;
 			foreach (var cell in Cells)
 			{
 				if (!ReferenceEquals(cell, sender))

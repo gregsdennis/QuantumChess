@@ -144,12 +144,37 @@ namespace QuantumChess.App.Model
 			return null;
 		}
 
-		private List<(int Row, int Column)> GetPotentialBlocksForRook(Piece piece, int targetRow, int targetCol)
+		private static List<(int Row, int Column)> GetPotentialBlocksForRook(Piece piece, int targetRow, int targetCol)
 		{
-			return null;
+			if (piece.Row != targetRow && piece.Column != targetCol) return null;
+
+			var blocks = new List<(int Row, int Column)>();
+
+			if (piece.Row == targetRow)
+			{
+				var direction = Math.Sign(targetCol - piece.Column);
+				var i = piece.Column + direction;
+				while (i != targetCol)
+				{
+					blocks.Add((targetRow, i));
+					i += direction;
+				}
+			}
+			else
+			{
+				var direction = Math.Sign(targetRow - piece.Row);
+				var i = piece.Row + direction;
+				while (i != targetRow)
+				{
+					blocks.Add((i, targetCol));
+					i += direction;
+				}
+			}
+
+			return blocks;
 		}
 
-		private List<(int Row, int Column)> GetPotentialBlocksForKnight(Piece piece, int targetRow, int targetCol)
+		private static List<(int Row, int Column)> GetPotentialBlocksForKnight(Piece piece, int targetRow, int targetCol)
 		{
 			if ((Math.Abs(piece.Row - targetRow) == 1 && Math.Abs(piece.Column - targetCol) == 2) ||
 			    (Math.Abs(piece.Row - targetRow) == 2 && Math.Abs(piece.Column - targetCol) == 1))
