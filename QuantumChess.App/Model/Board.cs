@@ -10,9 +10,11 @@ namespace QuantumChess.App.Model
 		// them manually.  The enumerator returned by arrays is a class, so we use that.
 		public Piece[] Pieces { get; private set; }
 
-		public PieceColor? CapturedKingColor { get; private set; }
+		public bool IsInCheck { get; private set; }
+	
+		public bool IsInCheckMate { get; private set; }
 
-		public bool IsKingCaptured => CapturedKingColor.HasValue;
+		public PieceColor? MatedKingColor { get; private set; }
 
 		private Board(){ }
 
@@ -65,7 +67,7 @@ namespace QuantumChess.App.Model
 
 		public Board PerformMove(int sourceRow, int sourceCol, int targetRow, int targetCol, PieceColor turn)
 		{
-			if (IsKingCaptured) return null;
+			if (IsInCheckMate) return null;
 
 			var piece = Pieces.FirstOrDefault(p => p.Row == sourceRow && p.Column == sourceCol && p.IsPlayable);
 			if (piece == null || piece.Color != turn)
@@ -87,12 +89,7 @@ namespace QuantumChess.App.Model
 			};
 			piece = board.Pieces.FirstOrDefault(p => p.Row == sourceRow && p.Column == sourceCol);
 			victim = board.Pieces.FirstOrDefault(p => p.Row == targetRow && p.Column == targetCol);
-			if (victim != null)
-			{
-				victim.Capture();
-				if (victim.Kind == PieceKind.King)
-					CapturedKingColor = victim.Color;
-			}
+			victim?.Capture();
 
 			if (!CanMovePiece(piece, targetRow, targetCol))
 			{
@@ -102,6 +99,9 @@ namespace QuantumChess.App.Model
 			
 			piece.Row = targetRow;
 			piece.Column = targetCol;
+
+			board.AnalyzeForChecks(turn);
+
 			return board;
 		}
 
@@ -234,6 +234,32 @@ namespace QuantumChess.App.Model
 		public void RevertDuplication()
 		{
 			DuplicationCount--;
+		}
+
+		private void AnalyzeForChecks(PieceColor turn)
+		{
+			if (IsInCheckMate) return;
+
+			var opposingKing = Pieces.Single(p => p.Kind == PieceKind.King && p.Color != turn);
+			IsInCheck = SomePieceCanMoveTo(turn, opposingKing.Row, opposingKing.Column);
+
+			if (!IsInCheck) return;
+
+			var potentialEscapes = new[] {(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)}
+				.Select(t => (opposingKing.Row + t.Item1, opposingKing.Column + t.Item2))
+				.Where(c => 0 <= c.Item1 && c.Item1 < 8 &&
+				            0 <= c.Item2 && c.Item2 < 8)
+				.Where(c => CanMovePiece(opposingKing, c.Item1, c.Item2));
+
+			IsInCheckMate = potentialEscapes.Any(c => SomePieceCanMoveTo(turn, c.Item1, c.Item2));
+			if (IsInCheckMate)
+				MatedKingColor = opposingKing.Color;
+		}
+
+		private bool SomePieceCanMoveTo(PieceColor turn, int targetRow, int targetCol)
+		{
+			return Pieces.Where(p => p.IsPlayable && p.Color == turn)
+				.Any(piece => CanMovePiece(piece, targetRow, targetCol));
 		}
 	}
 }

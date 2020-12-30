@@ -18,6 +18,8 @@ namespace QuantumChess.App.Model
 		private int _selectedBoardIndex = 1;
 		private int _blackWinCount;
 		private int _whiteWinCount;
+		private int _boardsInCheck;
+		private int _boardsInCheckMate;
 
 		public List<Board> Space { get; } = new List<Board>{Board.CreateNew()};
 
@@ -140,6 +142,28 @@ namespace QuantumChess.App.Model
 		public decimal BlackWinPercent => BlackWinCount / (decimal) TotalBoardCount;
 		public decimal WhiteWinPercent => WhiteWinCount / (decimal) TotalBoardCount;
 
+		public int BoardsInCheck
+		{
+			get => _boardsInCheck;
+			set
+			{
+				if (value == _boardsInCheck) return;
+				_boardsInCheck = value;
+				NotifyOfPropertyChange();
+			}
+		}
+
+		public int BoardsInCheckMate
+		{
+			get => _boardsInCheckMate;
+			set
+			{
+				if (value == _boardsInCheckMate) return;
+				_boardsInCheckMate = value;
+				NotifyOfPropertyChange();
+			}
+		}
+
 		public ICommand Reset { get; }
 
 		public BoardSpace()
@@ -161,8 +185,10 @@ namespace QuantumChess.App.Model
 		{
 			TotalBoardCount = Space.Sum(b => b.DuplicationCount);
 			DistinctBoardCount = Space.Count;
-			BlackWinCount = Space.Count(b => b.CapturedKingColor == PieceColor.White);
-			WhiteWinCount = Space.Count(b => b.CapturedKingColor == PieceColor.Black);
+			BlackWinCount = Space.Count(b => b.MatedKingColor == PieceColor.White);
+			WhiteWinCount = Space.Count(b => b.MatedKingColor == PieceColor.Black);
+			BoardsInCheck = Space.Count(b => b.IsInCheck);
+			BoardsInCheckMate = Space.Count(b => b.IsInCheckMate);
 
 			var quantumBoard = Enumerable.Range(0, 64).Select(i => new QuantumCell
 				{

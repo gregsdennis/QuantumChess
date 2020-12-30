@@ -68,6 +68,10 @@
 										</MultiBinding>
 									</controls:LabeledValue.Value>
 								</controls:LabeledValue>
+								<controls:LabeledValue Label="Boards in Check"
+								                       Value="{Binding BoardSpace.BoardsInCheck, RelativeSource={RelativeSource TemplatedParent}}"/>
+								<controls:LabeledValue Label="Boards in Check Mate" Background="LightGray"
+								                       Value="{Binding BoardSpace.BoardsInCheckMate, RelativeSource={RelativeSource TemplatedParent}}"/>
 								<StackPanel Margin="5,2">
 									<TextBlock Text="Selected Cell Composition" FontWeight="Bold" Margin="0,2"/>
 									<ItemsControl ItemsSource="{Binding BoardSpace.Selected.Pieces, RelativeSource={RelativeSource TemplatedParent}}">
