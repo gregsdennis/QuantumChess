@@ -21,6 +21,7 @@ namespace QuantumChess.App.Model
 		private int _boardsInCheck;
 		private int _boardsInCheckMate;
 		private bool _isReadyToPlay;
+		private Guid? _boardId;
 
 		public List<Board> Space { get; } = new List<Board>{Board.CreateNew()};
 
@@ -181,9 +182,22 @@ namespace QuantumChess.App.Model
 		public string ModeText => IsReadyToPlay ? "Play Mode" : "Exploration Mode";
 		public string PlayCommandText => IsReadyToPlay ? "Click to Explore" : "Click to Play";
 
+		public Guid? BoardId
+		{
+			get => _boardId;
+			set
+			{
+				if (Nullable.Equals(value, _boardId)) return;
+				_boardId = value;
+				NotifyOfPropertyChange();
+			}
+		}
+
 		public ICommand ReadyToPlay { get; }
 
 		public ICommand Reset { get; }
+
+		public ICommand TestChecksOfCurrentBoard { get; }
 
 		public BoardSpace()
 		{
@@ -201,6 +215,14 @@ namespace QuantumChess.App.Model
 				PopulateBoard();
 			});
 			ReadyToPlay = new SimpleCommand(() => IsReadyToPlay = !IsReadyToPlay);
+			TestChecksOfCurrentBoard = new SimpleCommand(() =>
+				{
+					if (!ViewSingleBoard) return;
+					var boardIndex =
+						SelectedBoardIndex - 1; // uses 1-indexing because it uses the board counts for the range
+					var board = Space[boardIndex];
+					board.AnalyzeForChecks(Turn.Other());
+				});
 		}
 
 		private void PopulateBoard()
@@ -230,6 +252,7 @@ namespace QuantumChess.App.Model
 		{
 			var boardIndex = SelectedBoardIndex - 1; // uses 1-indexing because it uses the board counts for the range
 			var board = Space[boardIndex];
+			BoardId = board.Id;
 
 			foreach (var piece in board.Pieces.Where(p => p.IsPlayable))
 			{
@@ -245,6 +268,7 @@ namespace QuantumChess.App.Model
 
 		private void PopulateQuantumBoard(List<QuantumCell> quantumBoard)
 		{
+			BoardId = null;
 			var enumerators = Space.Select(b => new {Enumerator = b.Pieces.GetEnumerator(), b.DuplicationCount}).ToList();
 			for (int i = 0; i < 32; i++)
 			{

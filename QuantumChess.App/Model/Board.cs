@@ -6,6 +6,8 @@ namespace QuantumChess.App.Model
 {
 	public class Board
 	{
+		public Guid Id { get; } = Guid.NewGuid();
+
 		// List<T>.Enumerator is a struct, but I need class enumerators so that I can advance
 		// them manually.  The enumerator returned by arrays is a class, so we use that.
 		public Piece[] Pieces { get; private set; }
@@ -108,7 +110,20 @@ namespace QuantumChess.App.Model
 		private bool CanMovePiece(Piece piece, int targetRow, int targetCol)
 		{
 			// return null if piece cannot move to target at all
-			var potentialBlocks = piece.Kind switch
+			var potentialBlocks = GetPotentialBlocks(piece, targetRow, targetCol);
+
+			if (potentialBlocks == null) return false;
+ 
+			var blocks = Pieces.Join(potentialBlocks,
+				p => (p.Row, p.Column),
+				b => (b.Row, b.Column),
+				(p, b) => b);
+			return !blocks.Any();
+		}
+
+		private IEnumerable<(int Row, int Column)> GetPotentialBlocks(Piece piece, int targetRow, int targetCol)
+		{
+			return piece.Kind switch
 			{
 				PieceKind.Pawn => GetPotentialBlocksForPawn(piece, targetRow, targetCol),
 				PieceKind.Rook => GetPotentialBlocksForRook(piece, targetRow, targetCol),
@@ -118,14 +133,6 @@ namespace QuantumChess.App.Model
 				PieceKind.King => GetPotentialBlocksForKing(piece, targetRow, targetCol),
 				_ => null
 			};
-
-			if (potentialBlocks == null) return false;
- 
-			var blocks = Pieces.Join(potentialBlocks,
-				p => (p.Row, p.Column),
-				b => (b.Row, b.Column),
-				(p, b) => b);
-			return !blocks.Any();
 		}
 
 		private IEnumerable<(int Row, int Column)> GetPotentialBlocksForPawn(Piece piece, int targetRow, int targetCol)
@@ -224,7 +231,7 @@ namespace QuantumChess.App.Model
 			return rookBlockers.Union(bishopBlockers).ToList();
 		}
 
-		private List<(int Row, int Column)> GetPotentialBlocksForKing(Piece piece, int targetRow, int targetCol)
+		private static List<(int Row, int Column)> GetPotentialBlocksForKing(Piece piece, int targetRow, int targetCol)
 		{
 			if (Math.Abs(targetRow - piece.Row) > 1 || Math.Abs(targetCol - piece.Column) > 1) return null;
 
@@ -236,22 +243,39 @@ namespace QuantumChess.App.Model
 			DuplicationCount--;
 		}
 
-		private void AnalyzeForChecks(PieceColor turn)
+		public void AnalyzeForChecks(PieceColor turn)
 		{
 			if (IsInCheckMate) return;
 
+			// Is there a piece that can capture our king? If so, in check.
 			var opposingKing = Pieces.Single(p => p.Kind == PieceKind.King && p.Color != turn);
-			IsInCheck = SomePieceCanMoveTo(turn, opposingKing.Row, opposingKing.Column);
+			var piecesThatCanCaptureKing = GetPiecesThatCanMoveTo(turn, opposingKing.Row, opposingKing.Column);
+			IsInCheck = piecesThatCanCaptureKing.Count != 0;
 
 			if (!IsInCheck) return;
 
+			// Can we capture the piece that's enforcing the check? If so, not in mate.
+			if (piecesThatCanCaptureKing.Any(p => GetPiecesThatCanMoveTo(turn.Other(), p.Row, p.Column).Count != 0)) return;
+
+			// Can we move any other pieces to block? If so, not in mate.
+			var potentialBlocks = piecesThatCanCaptureKing
+				.SelectMany(p => GetPotentialBlocks(p, opposingKing.Row, opposingKing.Column))
+				.Distinct();
+			var piecesThatCanBlock = potentialBlocks
+				.SelectMany(p => GetPiecesThatCanMoveTo(turn.Other(), p.Row, p.Column))
+				.Distinct()
+				.Where(p => p != opposingKing)
+				.ToList();
+			if (piecesThatCanBlock.Count != 0) return;
+
+			// Can the king run away? If so, not in mate.
 			var potentialEscapes = new[] {(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)}
 				.Select(t => (opposingKing.Row + t.Item1, opposingKing.Column + t.Item2))
 				.Where(c => 0 <= c.Item1 && c.Item1 < 8 &&
 				            0 <= c.Item2 && c.Item2 < 8)
 				.Where(c => CanMovePiece(opposingKing, c.Item1, c.Item2));
 
-			IsInCheckMate = potentialEscapes.Any(c => SomePieceCanMoveTo(turn, c.Item1, c.Item2));
+			IsInCheckMate = potentialEscapes.Any(c => GetPiecesThatCanMoveTo(turn, c.Item1, c.Item2).Count != 0);
 			if (IsInCheckMate)
 			{
 				IsInCheck = false;
@@ -259,10 +283,11 @@ namespace QuantumChess.App.Model
 			}
 		}
 
-		private bool SomePieceCanMoveTo(PieceColor turn, int targetRow, int targetCol)
+		private List<Piece> GetPiecesThatCanMoveTo(PieceColor turn, int targetRow, int targetCol)
 		{
 			return Pieces.Where(p => p.IsPlayable && p.Color == turn)
-				.Any(piece => CanMovePiece(piece, targetRow, targetCol));
+				.Where(piece => CanMovePiece(piece, targetRow, targetCol))
+				.ToList();
 		}
 	}
 }

@@ -30,6 +30,7 @@
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="Auto"/>
 								<ColumnDefinition/>
+								<ColumnDefinition Width="Auto"/>
 							</Grid.ColumnDefinitions>
 							<CheckBox Content="View Single Board" Margin="2"
 							          IsChecked="{Binding BoardSpace.ViewSingleBoard, RelativeSource={RelativeSource TemplatedParent}}"/>
@@ -37,6 +38,9 @@
 							        Maximum="{Binding BoardSpace.DistinctBoardCount, RelativeSource={RelativeSource TemplatedParent}}"
 							        Value="{Binding BoardSpace.SelectedBoardIndex, RelativeSource={RelativeSource TemplatedParent}}"
 							        IsEnabled="{Binding BoardSpace.ViewSingleBoard, RelativeSource={RelativeSource TemplatedParent}}"/>
+							<controls:LabeledValue Grid.Column="2" Label="Board Id"
+							                       Value="{Binding BoardSpace.BoardId, RelativeSource={RelativeSource TemplatedParent}}"
+							                       Visibility="{Binding BoardSpace.BoardId, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static converters:NullToVisibility.NullToCollapsed}}"/>
 						</Grid>
 						<Grid Grid.Column="1" Grid.RowSpan="2" Grid.IsSharedSizeScope="True">
 							<Grid.RowDefinitions>
@@ -85,6 +89,9 @@
 								</StackPanel>
 							</ItemsControl>
 							<ItemsControl Grid.Row="1" Margin="5">
+								<Button Command="{Binding BoardSpace.TestChecksOfCurrentBoard, RelativeSource={RelativeSource TemplatedParent}}"
+								        Content="Analyze for Checks" Margin="5"
+								        Visibility="Collapsed"/>  <!--Debug tool-->
 								<Button x:Name="ReadyButton" Margin="5" Height="NaN"
 								        Command="{Binding BoardSpace.ReadyToPlay, RelativeSource={RelativeSource TemplatedParent}}">
 									<Grid>
