@@ -52,6 +52,22 @@
 								                       Value="{Binding BoardSpace.TotalBoardCount, RelativeSource={RelativeSource TemplatedParent}}"/>
 								<controls:LabeledValue Label="Distinct Board Count" Background="LightGray"
 								                       Value="{Binding BoardSpace.DistinctBoardCount, RelativeSource={RelativeSource TemplatedParent}}"/>
+								<controls:LabeledValue Label="White Kings Captured">
+									<controls:LabeledValue.Value>
+										<MultiBinding ConverterParameter="{}{0} ({1:P2})" Converter="{x:Static converters:StringFormatter.Instance}">
+											<Binding Path="BoardSpace.BlackWinCount" RelativeSource="{RelativeSource TemplatedParent}" />
+											<Binding Path="BoardSpace.BlackWinPercent" RelativeSource="{RelativeSource TemplatedParent}" />
+										</MultiBinding>
+									</controls:LabeledValue.Value>
+								</controls:LabeledValue>
+								<controls:LabeledValue Label="Black Kings Captured" Background="LightGray">
+									<controls:LabeledValue.Value>
+										<MultiBinding ConverterParameter="{}{0} ({1:P2})" Converter="{x:Static converters:StringFormatter.Instance}">
+											<Binding Path="BoardSpace.WhiteWinCount" RelativeSource="{RelativeSource TemplatedParent}" />
+											<Binding Path="BoardSpace.WhiteWinPercent" RelativeSource="{RelativeSource TemplatedParent}" />
+										</MultiBinding>
+									</controls:LabeledValue.Value>
+								</controls:LabeledValue>
 								<StackPanel Margin="5,2">
 									<TextBlock Text="Selected Cell Composition" FontWeight="Bold" Margin="0,2"/>
 									<ItemsControl ItemsSource="{Binding BoardSpace.Selected.Pieces, RelativeSource={RelativeSource TemplatedParent}}">

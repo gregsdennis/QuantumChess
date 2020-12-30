@@ -10,7 +10,9 @@ namespace QuantumChess.App.Model
 		// them manually.  The enumerator returned by arrays is a class, so we use that.
 		public Piece[] Pieces { get; private set; }
 
-		public bool KingCaptured { get; private set; }
+		public PieceColor? CapturedKingColor { get; private set; }
+
+		public bool IsKingCaptured => CapturedKingColor.HasValue;
 
 		private Board(){ }
 
@@ -63,7 +65,7 @@ namespace QuantumChess.App.Model
 
 		public Board PerformMove(int sourceRow, int sourceCol, int targetRow, int targetCol, PieceColor turn)
 		{
-			if (KingCaptured) return null;
+			if (IsKingCaptured) return null;
 
 			var piece = Pieces.FirstOrDefault(p => p.Row == sourceRow && p.Column == sourceCol && p.IsPlayable);
 			if (piece == null || piece.Color != turn)
@@ -88,7 +90,8 @@ namespace QuantumChess.App.Model
 			if (victim != null)
 			{
 				victim.Capture();
-				KingCaptured = victim.Kind == PieceKind.King;
+				if (victim.Kind == PieceKind.King)
+					CapturedKingColor = victim.Color;
 			}
 
 			if (!CanMovePiece(piece, targetRow, targetCol))

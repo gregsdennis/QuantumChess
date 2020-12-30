@@ -13,7 +13,7 @@
 		</Grid.ColumnDefinitions>
     <TextBlock FontWeight="Bold"
 		           Text="{Binding Label, ElementName=LabeledValueRoot}"/>
-    <TextBlock Grid.Column="1" HorizontalAlignment="Right"
+    <TextBlock Grid.Column="1" HorizontalAlignment="Right" Margin="4,0,0,0"
                Text="{Binding Value, ElementName=LabeledValueRoot}"/>
 	</Grid>
 </UserControl>
