@@ -34,13 +34,14 @@
 							</Grid.ColumnDefinitions>
 							<CheckBox Content="View Single Board" Margin="2"
 							          IsChecked="{Binding BoardSpace.ViewSingleBoard, RelativeSource={RelativeSource TemplatedParent}}"/>
-							<Slider Grid.Column="1" Minimum="1" Margin="2"
+							<Slider Grid.Column="1" Minimum="1" Margin="2" SmallChange="1"
 							        Maximum="{Binding BoardSpace.DistinctBoardCount, RelativeSource={RelativeSource TemplatedParent}}"
 							        Value="{Binding BoardSpace.SelectedBoardIndex, RelativeSource={RelativeSource TemplatedParent}}"
 							        IsEnabled="{Binding BoardSpace.ViewSingleBoard, RelativeSource={RelativeSource TemplatedParent}}"/>
-							<controls:LabeledValue Grid.Column="2" Label="Board Id"
+							<!-- Debug tool -->
+							<!--<controls:LabeledValue Grid.Column="2" Label="Board Id"
 							                       Value="{Binding BoardSpace.BoardId, RelativeSource={RelativeSource TemplatedParent}}"
-							                       Visibility="{Binding BoardSpace.BoardId, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static converters:NullToVisibility.NullToCollapsed}}"/>
+							                       Visibility="{Binding BoardSpace.BoardId, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static converters:NullToVisibility.NullToCollapsed}}"/>-->
 						</Grid>
 						<Grid Grid.Column="1" Grid.RowSpan="2" Grid.IsSharedSizeScope="True">
 							<Grid.RowDefinitions>
@@ -74,7 +75,7 @@
 								</controls:LabeledValue>
 								<controls:LabeledValue Label="Boards in Check"
 								                       Value="{Binding BoardSpace.BoardsInCheck, RelativeSource={RelativeSource TemplatedParent}}"/>
-								<controls:LabeledValue Label="Boards in Check Mate" Background="LightGray"
+								<controls:LabeledValue Label="Boards in Checkmate" Background="LightGray"
 								                       Value="{Binding BoardSpace.BoardsInCheckMate, RelativeSource={RelativeSource TemplatedParent}}"/>
 								<StackPanel Margin="5,2">
 									<TextBlock Text="Selected Cell Composition" FontWeight="Bold" Margin="0,2"/>
@@ -89,9 +90,9 @@
 								</StackPanel>
 							</ItemsControl>
 							<ItemsControl Grid.Row="1" Margin="5">
-								<Button Command="{Binding BoardSpace.TestChecksOfCurrentBoard, RelativeSource={RelativeSource TemplatedParent}}"
-								        Content="Analyze for Checks" Margin="5"
-								        Visibility="Collapsed"/>  <!--Debug tool-->
+								<!--Debug tool-->
+								<!--<Button Command="{Binding BoardSpace.TestChecksOfCurrentBoard, RelativeSource={RelativeSource TemplatedParent}}"
+								        Content="Analyze for Checks" Margin="5"/>-->
 								<Button x:Name="ReadyButton" Margin="5" Height="NaN"
 								        Command="{Binding BoardSpace.ReadyToPlay, RelativeSource={RelativeSource TemplatedParent}}">
 									<Grid>

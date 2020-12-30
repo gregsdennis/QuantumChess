@@ -2,6 +2,10 @@
 
 A WPF variation of [Quantum Chess](https://quantumchess.net/).
 
+This was really more of an experiment to see how well a computer could handle tracking the explosion of quantum states of pieces as the game progresses.  So far, I've applied random plays up to around 23, and I didn't seen any degradation of CPU performance and it only used around 130 MB of memory.  I think it handles pretty well.
+
+The average game by humans is about 40 moves, where a move is counted as a play by white then a play by black.  (There's a specific name for what I'm calling a "play," but I can't be bothered to look it up right now.)  That would be 80 plays, so I'm only about a quarter of the way there... or however that works out with quantum exponentiation.
+
 ## How it works
 
 The idea of the game is pretty simple, but it gets really complex really quickly.
@@ -20,13 +24,13 @@ We start with a new board.  It looks pretty standard.
 
 White makes a move.
 
-![new board](Resources/example-screen2.png)
+![white move](Resources/example-screen2.png)
 
 > You can see both boards simultaneously.  When you select a cell, you can see the pieces present in that cell along with the probability that the piece is there.  The probability of a piece's presence is indicated by its opacity.
 
 Black makes a move.
 
-![new board](Resources/example-screen3.png)
+![black move](Resources/example-screen3.png)
 
 > Just like with white's move, there is now a 50% chance of the piece appearing in two different squares.
 > 
@@ -39,7 +43,7 @@ Black makes a move.
 
 Now white moves, and captures the black pawn.
 
-![new board](Resources/example-screen4.png)
+![white captures black](Resources/example-screen4.png)
 
 > Now it starts getting complex.  There's only one of the four boards where this move is valid, so:
 > 
@@ -61,10 +65,37 @@ Now white moves, and captures the black pawn.
 >
 > This is because there _was_ a 50% chance the black pawn was there, but with a 12.5% chance, it was captured by the white pawn.
 
+## The UI
+
+![full window](resources/full-window.png)
+
+The play area takes up the majority of the screen.
+
+In the upper right, are various stats:
+
+- **Turn** - Which player goes next.
+- **Turns** - How many moves have been made (white's moves + black's moves).
+- **Total Board Count** - The total number of boards.  This will always be `2^[Turns]` because each turn generates a no-op and a move.
+- **Distinct Board Count** - Some of the boards may be exact duplicates of others.  This tracks how many disctinct boards there are.
+- **White Kings Captured** - How many boards have a white king in checkmate (black win count).
+- **Black Kings Captured** - How many boards have a black king in checkmate (white win count).
+- **Boards in Check** - How many boards have either king in check, but not in mate.
+- **Boards in Checkmate** - How many boards have either king in checkmate.  This will be the sum of the kings captured.
+- **Selected Cell Composition** - When selecting a cell, this will list out the unique pieces and their probabilities of being in that cell.
+
+In the bottom right are some commands.
+
+- **Play/Explore Mode** - Toggles between playing and exploring.  Explore mode allows you to select cells without being able to move any pieces.  This is useful when studying the board.  Default state is play mode.
+- **New Game** - Resets the board space for a new game.
+
+At the bottom is a checkbox which enables a slider.  This slider will allow you to view all of the distinct boards individually without the transparency/overlay effect.  The slider can also be navigated with the left and right arrow keys.
+
+The screen shot above is the [Fool's Mate](https://en.wikipedia.org/wiki/Fool%27s_mate).  Only one of the 16 boards results in a checkmate; another one is in a simple check (because the black queen can still be blocked by the white pawn); and the rest are just in-progress games.
+
 ## Some other notes
+
+Thanks to @Kairus101 for inspiring this project and helping work out details of how the game should work.
 
 I feel that this app properly models the quantum nature of the game.  We had explored the idea of just maintaining and calculating probabilities, but we determined that there are cases where this wouldn't suffice.
 
 Suppose we have in our board space a board that has a white pawn at **C4** at a 25% probability and a black rook at **C1** also at a 25% probability.  We want to move the rook to **C5**.  If we just look at probabilities, then there's a 6.25% probability that the move can be made.  But in the _actual_ quantum board space, the rook's 25% and the pawns 25% may be completely disjoint.  This would mean that there's a 100% chance that the rook would move _in the boards that had the rook there_ because there's no board where the rook would be blocked.  This can't be modeled with mere probabilities, so we have to track each board.
-
-Thanks to @Kairus101 for inspiring this project and helping work out details of how the game should work.
