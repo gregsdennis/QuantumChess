@@ -20,6 +20,7 @@ namespace QuantumChess.App.Model
 		private int _whiteWinCount;
 		private int _boardsInCheck;
 		private int _boardsInCheckMate;
+		private bool _isReadyToPlay;
 
 		public List<Board> Space { get; } = new List<Board>{Board.CreateNew()};
 
@@ -164,12 +165,31 @@ namespace QuantumChess.App.Model
 			}
 		}
 
+		public bool IsReadyToPlay
+		{
+			get => _isReadyToPlay;
+			set
+			{
+				if (value == _isReadyToPlay) return;
+				_isReadyToPlay = value;
+				NotifyOfPropertyChange();
+				NotifyOfPropertyChange(nameof(ModeText));
+				NotifyOfPropertyChange(nameof(PlayCommandText));
+			}
+		}
+
+		public string ModeText => IsReadyToPlay ? "Play Mode" : "Exploration Mode";
+		public string PlayCommandText => IsReadyToPlay ? "Click to Explore" : "Click to Play";
+
+		public ICommand ReadyToPlay { get; }
+
 		public ICommand Reset { get; }
 
 		public BoardSpace()
 		{
 			PopulateBoard();
 			_turn = PieceColor.White;
+			IsReadyToPlay = true;
 
 			Reset = new SimpleCommand(() =>
 			{
@@ -177,8 +197,10 @@ namespace QuantumChess.App.Model
 				Space.Add(Board.CreateNew());
 				Turn = PieceColor.White;
 				Turns = 0;
+				IsReadyToPlay = true;
 				PopulateBoard();
 			});
+			ReadyToPlay = new SimpleCommand(() => IsReadyToPlay = !IsReadyToPlay);
 		}
 
 		private void PopulateBoard()
@@ -260,7 +282,7 @@ namespace QuantumChess.App.Model
 
 		private void UpdateSelection(object sender, EventArgs e)
 		{
-			if (Selected != null && Selected.IsSelected && Selected.Pieces.Count != 0)
+			if (IsReadyToPlay && Selected != null && Selected.IsSelected && Selected.Pieces.Count != 0)
 			{
 				var targetCell = (QuantumCell) sender;
 				var targetIndex = Cells.IndexOf(targetCell);

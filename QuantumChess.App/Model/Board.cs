@@ -253,7 +253,10 @@ namespace QuantumChess.App.Model
 
 			IsInCheckMate = potentialEscapes.Any(c => SomePieceCanMoveTo(turn, c.Item1, c.Item2));
 			if (IsInCheckMate)
+			{
+				IsInCheck = false;
 				MatedKingColor = opposingKing.Color;
+			}
 		}
 
 		private bool SomePieceCanMoveTo(PieceColor turn, int targetRow, int targetCol)

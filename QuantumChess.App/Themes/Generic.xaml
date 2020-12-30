@@ -84,7 +84,18 @@
 									</ItemsControl>
 								</StackPanel>
 							</ItemsControl>
-							<ItemsControl Grid.Row="1">
+							<ItemsControl Grid.Row="1" Margin="5">
+								<Button x:Name="ReadyButton" Margin="5" Height="NaN"
+								        Command="{Binding BoardSpace.ReadyToPlay, RelativeSource={RelativeSource TemplatedParent}}">
+									<Grid>
+										<Grid.RowDefinitions>
+											<RowDefinition/>
+											<RowDefinition/>
+										</Grid.RowDefinitions>
+										<TextBlock Text="{Binding BoardSpace.ModeText, RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Center"/>
+										<TextBlock Grid.Row="1" Text="{Binding BoardSpace.PlayCommandText, RelativeSource={RelativeSource TemplatedParent}}" HorizontalAlignment="Center"/>
+									</Grid>
+								</Button>
 								<Button Command="{Binding BoardSpace.Reset, RelativeSource={RelativeSource TemplatedParent}}"
 								        Content="New Game" Margin="5"/>
 							</ItemsControl>
