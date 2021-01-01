@@ -6,6 +6,8 @@ namespace QuantumChess.App.Model
 {
 	public class Board
 	{
+		private static readonly (int, int)[] _kingMovements = {(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)};
+		
 		public Guid Id { get; } = Guid.NewGuid();
 
 		// List<T>.Enumerator is a struct, but I need class enumerators so that I can advance
@@ -269,7 +271,7 @@ namespace QuantumChess.App.Model
 			if (piecesThatCanBlock.Count != 0) return;
 
 			// Can the king run away? If so, not in mate.
-			var potentialEscapes = new[] {(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)}
+			var potentialEscapes = _kingMovements
 				.Select(t => (opposingKing.Row + t.Item1, opposingKing.Column + t.Item2))
 				.Where(c => 0 <= c.Item1 && c.Item1 < 8 &&
 				            0 <= c.Item2 && c.Item2 < 8)
