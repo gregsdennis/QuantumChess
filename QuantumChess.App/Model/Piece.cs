@@ -33,9 +33,6 @@ namespace QuantumChess.App.Model
 
 		public void Capture()
 		{
-			if (!IsPlayable)
-				throw new InvalidOperationException("Piece is not playable.");
-
 			IsPlayable = false;
 		}
 

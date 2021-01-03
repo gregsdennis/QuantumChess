@@ -150,7 +150,7 @@
 	</DataTemplate>
 
 	<DataTemplate DataType="{x:Type model:PieceProbability}">
-		<Grid x:Name="PieceRoot"  Opacity="{Binding Probability}">
+		<Grid x:Name="PieceRoot"  Opacity="{Binding Probability, Converter={x:Static converters:ValueClampConverter.Instance}, ConverterParameter='0.3..1'}">
 			<Viewbox Stretch="Uniform" Margin="15">
 				<materialDesign:PackIcon x:Name="Image" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 			</Viewbox>
